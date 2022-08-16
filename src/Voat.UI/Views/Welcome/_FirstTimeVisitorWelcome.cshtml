@@ -1,0 +1,29 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@{
+    <div class="alert alert-firsttimevisitorwelcome alert-dismissible" role="alert" style="display: none" id="firsttimevisitorwelcomemessage">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <p>Hi, it looks like you're new. Welcome to @VoatSettings.Instance.SiteName!</p>
+        <p>@VoatSettings.Instance.SiteName is a censorship-free community platform where content is submitted, organized, moderated and voted on (ranked) by the users.</p>
+        <p>Users can earn a percentage of our ad-revenue share for the content they submit.</p>
+        <a href="~/about/intro" class="btn-tour">Take a tour</a>
+    </div>
+}

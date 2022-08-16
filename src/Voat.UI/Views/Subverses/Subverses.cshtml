@@ -1,0 +1,89 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@model PaginatedList<Voat.Data.Models.Subverse>
+
+@{
+    string sortingMode = ViewBag.SortingMode;
+    string description = "Showing subverses ordered by number of subscribers.";
+   
+    switch (sortingMode)
+    {
+        case "new":
+            ViewBag.Title = "Newest subverses";
+            Model.RouteName = "NewestSubverses";
+            description = "Showing the most recently registered subverses.";
+            break;
+        case "active":
+            ViewBag.Title = "Active subverses";
+            Model.RouteName = "ActiveSubverses";
+            description = "Showing subverses ordered by posting activity.";
+            break;
+        default:
+            ViewBag.Title = "Most popular subverses";
+            Model.RouteName = "Subverses";
+            description = "Showing subverses ordered by number of subscribers.";
+            break;
+    }
+}
+
+<style type="text/css">
+    body > .content .link .rank {
+        width: 3.2ex;
+    }
+</style>
+
+<div id="container">
+    <div class="side">
+        <div class="spacer">
+            <div class="sidebox create">
+                <a href="/subverses/create" class="btn-whoaverse btn-block">
+                    Create your own subverse
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="content" role="main">
+        <div class="alert-notice">
+            <p>@description</p>
+        </div>
+        <div class="sitetable linklisting">
+
+            @using (var enumerator = Model.GetEnumerator())
+            {
+                Voat.Domain.Models.DomainReferenceDetails current = null;
+                while (enumerator.MoveNext())
+                {
+                    current = Voat.Domain.Models.DomainReferenceDetails.Map(enumerator.Current);
+                    <div class="row">
+                        <div class="col-md-6">@Html.DisplayFor(x => current)</div>
+                        @if (enumerator.MoveNext())
+                        {
+                            current = Voat.Domain.Models.DomainReferenceDetails.Map(enumerator.Current);
+                            <div class="col-md-6">@Html.DisplayFor(x => current)</div>
+                        }
+                    </div>
+                }
+            }
+            @Html.DisplayFor(model => Model, "IPaginatedList")
+        </div>
+    </div>
+</div>

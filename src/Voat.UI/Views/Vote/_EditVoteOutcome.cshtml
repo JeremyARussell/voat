@@ -1,0 +1,26 @@
+﻿@model VoteOutcome
+
+<div data-voat-item="Outcomes">
+    <div class="form-horizontal" role="form">
+
+        @Html.Partial("_Header", Model)
+
+        <input asp-for="ID" type="hidden" data-voat-field="Outcomes">
+        <input asp-for="TypeName" type="hidden" data-voat-field="Outcomes">
+
+        @if (Model is AddModeratorOutcome add)
+        {
+            @Html.Partial("_EditAddModeratorOutcome", add)
+        }
+        else if (Model is RemoveModeratorOutcome remove)
+        {
+            @Html.Partial("_EditRemoveModeratorOutcome", remove)
+        }
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button class="btn-voat" onclick="voat.voting.removeItem(this, 'div[data-voat-item=\'Outcomes\']');">Remove</button>
+            </div>
+        </div>
+    </div>
+</div>

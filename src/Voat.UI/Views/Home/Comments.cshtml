@@ -1,0 +1,108 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@using Voat.Models;
+@using Voat.Domain.Models;
+
+@model CommentSegment
+
+@{
+    Voat.Domain.Models.Submission submission = ViewBag.Submission;
+}
+
+<style type="text/css">
+    body > .content .link .rank {
+        width: 3.2ex;
+    }
+</style>
+
+@section PageHeader {
+    @Html.Partial("_SubverseStylesheetLink", submission.Subverse, new ViewDataDictionary(ViewData))
+}
+
+
+<div id="container">
+    @*
+        display 1 submission with details and comments
+    *@
+
+    @await Component.InvokeAsync("Sidebar",
+        new {
+            domainReference = new Voat.Domain.Models.DomainReference(DomainType.Subverse, submission.Subverse),
+            contentReference = new ContentReference() { Type = ContentType.Submission, ID = submission.ID }
+        })
+
+    <div class="content" role="main">
+        <br /><br />
+        @Html.Partial("~/Views/Welcome/_FirstTimeVisitorWelcome.cshtml")
+
+        @{
+            //type 1 = message submission
+            if (submission.Type == Voat.Domain.Models.SubmissionType.Text)
+            {
+                //I don't know if we need this ViewBag setup
+                ViewBag.Title = submission.Title + " | " + submission.Subverse;
+                //ViewBag.Url = ViewBag.Url ?? Context.Request.Url.AbsoluteUri;
+                //ViewBag.Image = ViewBag.Image ?? Context.Request.Url.Scheme + "://" + Context.Request.Url.Authority + VoatSettings.Instance.SiteLogo;
+                ViewBag.Description = ViewBag.Description ?? VoatSettings.Instance.SiteSlogan;
+                @Html.Partial("~/Views/Shared/Submissions/_SubmissionDetail.cshtml", submission,
+                    new ViewDataDictionary(ViewData) {
+                        //{ "ModeratorList", ViewBag.ModeratorList },
+                        { "SubverseAnonymized", ViewBag.SubverseAnonymized }
+                    })
+            }
+
+            //type 2 = link submission
+            else if (submission.Type == Voat.Domain.Models.SubmissionType.Link)
+            {
+                //I don't know if we need this ViewBag setup
+                ViewBag.Title = submission.Title + " | " + submission.Subverse;
+                //ViewBag.Url = ViewBag.Url ?? Context.Request.Url.AbsoluteUri;
+                ViewBag.Description = ViewBag.Description ?? VoatSettings.Instance.SiteSlogan;
+
+                ////check if submission has a thumb, otherwise point to site logo
+                //if (submission.ThumbnailUrl != null)
+                //{
+                //    ViewBag.Image = submission.ThumbnailUrl; 
+                //}
+                //else
+                //{
+                //    ViewBag.Image = ViewBag.Image ?? Context.Request.Url.Scheme + "://" + Context.Request.Url.Authority + VoatSettings.Instance.SiteLogo;
+                //}
+
+                @Html.Partial("~/Views/Shared/Submissions/_SubmissionDetail.cshtml", submission,
+                    new ViewDataDictionary(ViewData) {
+                        //{ "ModeratorList", ViewBag.ModeratorList },
+                        { "SubverseAnonymized", ViewBag.SubverseAnonymized }
+                    })
+            }
+        }
+
+        @if (!submission.ArchiveDate.HasValue && User.Identity.IsAuthenticated)
+        //if user logged in, show add comment form
+        {
+            @Html.Partial("_AddComment", new Voat.Data.Models.Comment() { SubmissionID = submission.ID })
+        }
+
+        <div class="horizontal-line"></div>
+
+        @Html.Partial("~/Views/Shared/Comments/_CommentTree.cshtml", Model, ViewData)
+    </div>
+</div>

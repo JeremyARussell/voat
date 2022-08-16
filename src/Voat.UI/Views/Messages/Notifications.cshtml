@@ -1,0 +1,99 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+
+@{
+    ViewBag.Title = "Notifications";
+}
+
+@model IEnumerable<Voat.Domain.Models.MessageCounts>
+
+<div id="container">
+    <div class="content-no-margin" role="main">
+        <div class="alert-title">Unread Notifications for @User.Identity.Name</div>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var messageCount in Model)
+            {
+                var inboxUrl = "";
+                if (messageCount.UserDefinition.Type == Voat.Domain.Models.IdentityType.User)
+                {
+                    inboxUrl = @"/messages/private";
+                }
+                else
+                {
+                    inboxUrl = String.Format("/v/{0}/about/messages", messageCount.UserDefinition.Name);
+                }
+                var unreadDisplay = "";
+                if (messageCount.Total > 0)
+                {
+                    unreadDisplay = String.Format("({0} unread)", @messageCount.Total);
+                }
+                <div class="mailbox">
+                    <h1><a href="@inboxUrl">@messageCount.UserDefinition.ToString()</a> @unreadDisplay</h1>
+
+                    @if (messageCount.Counts.Any())
+                    {
+                        foreach (var itemCount in messageCount.Counts)
+                        {
+                            if (messageCount.UserDefinition.Type == Voat.Domain.Models.IdentityType.User)
+                            {
+                                @* This is user messages, provide links *@
+                                switch (itemCount.Type)
+                                {
+                                    case Voat.Domain.Models.MessageType.Private:
+                                        <p><a href="/messages/private">@itemCount.Type.ToFriendly()</a> - @itemCount.Count</p>
+                                        break;
+                                    case Voat.Domain.Models.MessageType.Sent:
+                                        <p><a href="/messages/sent">@itemCount.Type.ToFriendly()</a> - @itemCount.Count</p>
+                                        break;
+                                    case Voat.Domain.Models.MessageType.CommentMention:
+                                        <p><a href="/messages/mentions/comment">@itemCount.Type.ToFriendly()</a> - @itemCount.Count</p>
+                                        break;
+                                    case Voat.Domain.Models.MessageType.SubmissionMention:
+                                        <p><a href="/messages/mentions/submission">@itemCount.Type.ToFriendly()</a> - @itemCount.Count</p>
+                                        break;
+                                    case Voat.Domain.Models.MessageType.CommentReply:
+                                        <p><a href="/messages/replies/comment">@itemCount.Type.ToFriendly()</a> - @itemCount.Count</p>
+                                        break;
+                                    case Voat.Domain.Models.MessageType.SubmissionReply:
+                                        <p><a href="/messages/replies/submission">@itemCount.Type.ToFriendly()</a> - @itemCount.Count</p>
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                <p>@itemCount.Type.ToFriendly() - @itemCount.Count</p>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <p>No unread</p>
+                    }
+            </div>
+            }
+        }
+        else
+        {
+            <p>No new notifications - you are all good</p>
+        }
+    </div>
+</div>

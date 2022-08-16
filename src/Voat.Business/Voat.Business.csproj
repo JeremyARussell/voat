@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <Company>Voat, Inc.</Company>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <AssemblyFileVersion>1.0.0.0</AssemblyFileVersion>
+    <AssemblyTitle>Voat.Business</AssemblyTitle>
+    <AssemblyProduct>Voat.Business</AssemblyProduct>
+    <Version>2.0.0</Version>
+    <Authors>Voat, Inc.</Authors>
+    <Description>Voat Business Library</Description>
+    <Copyright>Voat, Inc.</Copyright>
+    <RootNamespace>Voat</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1705;1591,1572,1571,1573,1587,1570</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CoreCompat.System.Drawing.v2" Version="5.2.0-preview1-r131" />
+    <PackageReference Include="Dapper" Version="1.50.2" />
+    <PackageReference Include="dotnet-test-nunit" Version="3.4.0-beta-3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor" Version="2.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.0.0" />
+    <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Sendgrid" Version="9.9.0" />
+    <PackageReference Include="StackExchange.Redis.StrongName" Version="1.2.6" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.4.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\external\Source\ghorsey\OpenGraph-Net\OpenGraph-Net.csproj" />
+    <ProjectReference Include="..\external\Source\toptensoftware\MarkdownDeep\MarkdownDeep.csproj" />
+    <ProjectReference Include="..\frameworks\Voat.Validation\Voat.Validation.fsproj" />
+    <ProjectReference Include="..\Voat.Common\Voat.Common.csproj" />
+    <ProjectReference Include="..\Voat.Data\Voat.Data.csproj" />
+    <ProjectReference Include="..\Voat.Logging\Voat.Logging.csproj" />
+    <ProjectReference Include="..\Voat.RulesEngine\Voat.RulesEngine.csproj" />
+    <ProjectReference Include="..\Voat.Voting\Voat.Voting.csproj" />
+  </ItemGroup>
+</Project>

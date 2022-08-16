@@ -1,0 +1,67 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@model Voat.Models.ViewModels.SearchViewModel
+
+@{
+    if (VoatSettings.Instance.SearchEnabled)
+    {
+        string selectedSubverse = "";
+        bool limit = true;
+
+        if (!String.IsNullOrEmpty(Context.Request.Query["sub"]))
+        {
+            selectedSubverse = Context.Request.Query["sub"];
+        }
+        else if (!String.IsNullOrEmpty(Model.Sub))
+        {
+            selectedSubverse = Model.Sub;
+        }
+
+        if (!String.IsNullOrEmpty(Context.Request.Query["l"]))
+        {
+            limit = Context.Request.Query["l"].First().ToLower() == "true";
+        }
+
+
+        <div class="spacersection spacer">
+    
+            <div class="alert-h1">
+                Search @VoatSettings.Instance.SiteName
+            </div>
+
+            @using (Html.BeginForm("SearchResults", "Search", new { }, FormMethod.Get, false, new { @class = "form-horizontal", role = "form" }))
+            {
+                <h2>@Html.ValidationSummary(true)</h2>
+                @Html.TextBox("q", null, new { @class = "form-control", @placeholder = "Search " + VoatSettings.Instance.SiteName })
+                @Html.ValidationMessage("q")
+
+                if (!String.IsNullOrEmpty(selectedSubverse))
+                {
+                    @Html.Hidden("sub", selectedSubverse)
+                    <input type="checkbox" name="l" value="true" id="l"
+                           @(limit ? "checked=\"checked\"" : "") />
+
+                    @Html.Label("selectedSubverse", "Limit to v/" + selectedSubverse)
+                }
+            }
+        </div>
+    }
+}

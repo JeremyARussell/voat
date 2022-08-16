@@ -1,0 +1,98 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@model Voat.Domain.Models.Submission
+
+@* 1 user link submission with details without comments *@
+@{
+    string ahrefTarget = "_self";
+
+    if (User.Identity.IsAuthenticated)
+    {
+        var userData = Voat.Domain.UserData.GetContextUserData(Context);
+        if (userData.Preferences.OpenInNewWindow)
+        {
+            ahrefTarget = "_blank";
+        }
+    }
+
+    string postAge = Age.ToRelative(Model.CreationDate);
+    string commentsUrl = VoatUrlFormatter.CommentsPagePath(Model.Subverse, Model.ID);
+
+    bool ratedAdult = false;
+    
+    //type 2 = urls, model.Url = url, model.linkdescription = link description
+    if (Model.Type == Voat.Domain.Models.SubmissionType.Link)
+    {
+        string submissionDomain = UrlUtility.GetDomainFromUri(Model.Url);
+        int submissionScore = (int)(Model.UpCount - Model.DownCount);
+
+        <div class="submission odd link" data-fullname="" data-ups="" data-downs="">
+            <p class="parent"></p>
+
+            <div class="midcol unvoted">
+                <div class="score dislikes">@Model.DownCount</div>
+                <div class="submissionscore">@submissionScore</div>
+                <div class="score likes">@Model.UpCount</div>
+            </div>
+
+            @if (Model.ThumbnailUrl != null)
+            {
+                if (Model.Title.ToLower().Contains("nsfw") || ratedAdult)
+                {
+                    <a class="thumbnail nsfw may-blank " href="@Model.Url" rel="nofollow" target="@ahrefTarget"></a>
+                }
+                else
+                {
+                    <a class="thumbnail may-blank" href="@Model.Url" target="@ahrefTarget">
+                        <img src="@Model.ThumbnailUrl" alt="@Model.Title" />
+                    </a>
+                }
+            }
+
+            <div class="entry unvoted">
+                <p class="title">
+                    <a class="title may-blank " href="@Model.Url" tabindex="1" rel="nofollow" target="@ahrefTarget">@Model.Title</a>
+                    <span class="domain">(<a href="/domains/@submissionDomain/">@submissionDomain</a>)</span>
+                </p>
+                <p class="tagline">
+                    submitted
+                    <time title="@Model.CreationDate" datetime="@Model.CreationDate">@postAge</time> ago by <a href="~/user/@Model.UserName" class="author may-blank">@Model.UserName</a>
+                    <span class="score unvoted">@submissionScore points</span>
+                    <span class="commentvotesratio">(<span class="post_upvotes">+@Model.UpCount</span>|<span class="post_downvotes">-@Model.DownCount</span>)</span>
+                    <span class="userattrs"></span> to <a href="/v/@Model.Subverse" class="subverse hover may-blank">@Model.Subverse</a>
+                </p>
+                <ul class="flat-list buttons">
+                    <li class="first">
+                        <a href="@commentsUrl" class="comments may-blank">@Model.CommentCount.PluralizeIt("comment")</a>
+                    </li>
+                </ul>
+                <div class="expando" style="display: none">
+                    <span class="error">loading...</span>
+                </div>
+            </div>
+            <div class="child"></div>
+            <div class="clearleft">
+                @*IE6fix*@
+            </div>
+        </div>
+    }
+
+}

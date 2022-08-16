@@ -1,0 +1,61 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@using Voat.Models.ViewModels
+
+@{
+    IEnumerable<string> subscriptionList = null;
+
+    // get user subscriptions
+    if (User.Identity.IsAuthenticated)
+    {
+        var userData = Voat.Domain.UserData.GetContextUserData(Context);
+        System.Diagnostics.Debug.Assert(userData == null || userData.UserName == User.Identity.Name, "Context UserData and Identity UserName mismatch");
+
+        //subscriptionList = UserHelper.UserSubscriptions(User.Identity.Name);
+        subscriptionList = userData.SubverseSubscriptions;
+    }
+}
+
+<li>
+    <a href="#">subscriptions</a>
+    <span class="drop-arrow"></span>
+    <ul>
+        <li><a href="/user/subscribed/subverse"><b>Edit your subscriptions</b></a></li>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <li><a href="/user/blocked/subverse"><b>Edit your blocked subverses</b></a></li>
+            <li><a href="/user/blocked/user"><b>Edit your blocked users</b></a></li>
+        }
+
+        @if (subscriptionList != null)
+        {
+            foreach (var subverse in subscriptionList)
+            {
+                <li><a href="/v/@subverse">@subverse</a></li>
+            }
+        }
+        else
+        {
+            <li><a href="#">You are not subscribed to any subverses.</a></li>
+        }
+    </ul>
+</li>
+

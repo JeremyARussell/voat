@@ -1,0 +1,93 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@using Voat.Domain.Models;
+
+@model CommentSegment
+
+<div class='commentarea'>
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div class="menuarea">
+            <div class="spacer">
+                <span class="label label-default">want to join the discussion? <a href="javascript:void(0)" onclick="mustLogin();" class="login-required">login</a> or <a href="/account/register">register</a> in seconds.</span>
+            </div>
+        </div>
+    }
+    @if (ViewBag.StartingCommentId == null)
+    {
+        <div class="menuarea">
+            <div class="spacer">
+                <span class="dropdown-title lightdrop">sort by: </span>
+                <div class="dropdown lightdrop">
+                    <span class="selected">
+                        @{
+                            var sort = CommentSortAlgorithm.New;
+                            if (Model.Sort != sort)
+                            {
+                                <a href="javascript:getCommentTree(@ViewBag.Submission.ID, '@sort.ToString()');" class="bylink" rel="nofollow">@sort.ToString()</a>
+                            }
+                            sort = CommentSortAlgorithm.Top;
+                            if (Model.Sort != sort)
+                            {
+                                <a href="javascript:getCommentTree(@ViewBag.Submission.ID, '@sort.ToString()');" class="bylink" rel="nofollow">@sort.ToString()</a>
+                            }
+                           
+                            sort = CommentSortAlgorithm.Bottom;
+                            if (Model.Sort != sort)
+                            {
+                                <a href="javascript:getCommentTree(@ViewBag.Submission.ID, '@sort.ToString()');" class="bylink" rel="nofollow">@sort.ToString()</a>
+                            }
+                            sort = CommentSortAlgorithm.Intensity;
+                            if (Model.Sort != sort)
+                            {
+                                <a href="javascript:getCommentTree(@ViewBag.Submission.ID, '@sort.ToString()');" class="bylink" rel="nofollow">@sort.ToString()</a>
+                            }
+                            sort = CommentSortAlgorithm.Old;
+                            if (Model.Sort != sort)
+                            {
+                                <a href="javascript:getCommentTree(@ViewBag.Submission.ID, '@sort.ToString()');" class="bylink" rel="nofollow">@sort.ToString()</a>
+                            }
+                        }
+                       
+                    </span>
+                </div>
+            </div>
+            <div class="spacer"></div>
+        </div>
+        <div class="menuarea">
+            <h2><span id="comment-sort-label" class="label label-default">Sort: @Model.Sort.ToString()</span></h2>
+        </div>
+    }
+   
+    @if (ViewBag.StartingCommentId != null)
+    {
+        <div class="alert-singlethread">
+            You are viewing a single comment's thread.
+            <p>
+                <a href="@VoatUrlFormatter.CommentsPagePath(ViewBag.Subverse.Name, ViewBag.Submission.ID)">view the rest of the comments</a>&nbsp;→
+            </p>
+        </div>
+    }
+
+    <div id="siteTable" class="sitetable nestedlisting">
+        @Html.Partial("~/Views/Shared/Comments/_CommentSegment.cshtml", Model, ViewData)
+    </div>
+</div>

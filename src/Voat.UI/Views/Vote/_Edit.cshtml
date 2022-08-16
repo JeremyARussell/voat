@@ -1,0 +1,113 @@
+﻿@*
+
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@{ 
+    Layout = null;
+}
+@model Voat.Domain.Models.Vote
+<div id="container">
+    <div role="main">
+        <form id="formSave" asp-action="Save" asp-controller="Vote" method="post">
+            <div class="row nomargin" data-voat-item="vote">
+                <div asp-validation-summary="All"></div>
+                <div class="alert-title">Create/Edit Vote</div>
+                <div class="form-horizontal" role="form">
+                    @*<input asp-for="SubverseID" type="hidden" data-voat-field="vote">*@
+                    <input asp-for="ID" type="hidden" data-voat-field="vote">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" for="Subverse">Subverse</label>
+                        <div class="col-md-10">
+                            <input asp-for="Subverse" class="form-control" type="text" data-voat-field="vote" disabled="disabled" value="@Model.Subverse">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" for="Bio">Title</label>
+                        <div class="col-md-10">
+                            <input asp-for="Title" class="form-control" type="text" data-voat-field="vote">
+                            <span asp-validation-for="Title"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label" for="Bio">Description</label>
+                        <div class="col-md-10">
+                            @Html.MarkdownEditorFor(x => x.Content, new { data_voat_field = "vote", @class = "form-control"  })
+                            <span asp-validation-for="Content"></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="alert-title">Options</div>
+                    <span asp-validation-for="Options"></span>
+                    <div data-voat-list="Options">
+                    @if (Model.Options != null && Model.Options.Any())
+                    {
+                        for (int i = 0; i < Model.Options.Count; i++)
+                        {
+                                @Html.PartialFor(x => Model.Options[i], "_Option");
+                        }
+                    }
+                    </div>
+                    <div class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-3">
+                                <button class="btn-whoaverse" onclick="voat.voting.addOption(this);" type="button">Add Option</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="alert-title">Restrictions (Optional)</div>
+                    <span asp-validation-for="Restrictions"></span>
+                    <div data-voat-list="Restrictions">
+                    @if (Model.Restrictions != null && Model.Restrictions.Any())
+                    {
+                        for (int i = 0; i < Model.Restrictions.Count; i++)
+                        {
+                            var viewData = new ViewDataDictionary(ViewData);
+                            viewData.TemplateInfo.HtmlFieldPrefix = $"Restrictions[{i.ToString()}]";
+                            @Html.Partial("_EditVoteRestriction", Model.Restrictions[i], viewData);
+                        }
+                    }
+                    </div>
+                    <div class="form-horizontal addVoteOption" role="form">
+                        <div class="form-group">
+                            <div class="col-md-10">
+                                @*Get this data from reflection*@
+                                <select name="vote-restriction-type" class="form-control" id="vote-restriction-type" type="text"
+                                        asp-items="Voat.Domain.Models.VoteMetadata.Instance.Restrictions.Select(x => new SelectListItem() {
+                                    Text = x.Attribute.Name,
+                                    Value = x.Type.Name
+                                })"></select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="class="col-md-10">
+                                <button class="btn-whoaverse" type="button" onclick="voat.voting.addRestriction(this);">Add Restriction</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-whoaverse" type="submit">Save</button>
+        </form>
+    </div>
+</div>
+
+

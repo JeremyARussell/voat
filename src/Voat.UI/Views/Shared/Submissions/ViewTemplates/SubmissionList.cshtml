@@ -1,0 +1,143 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@using Voat.Domain.Models
+
+@model Voat.Models.ViewModels.ListViewModel<Submission>
+
+@{
+    ViewBag.Title = Model.Title;
+    ViewBag.Description = Model.Description;
+    int counter = 0;
+}
+
+@section PageHeader {
+    @if (Model.IsActualSubverse)
+    {
+        @Html.Partial("_SubverseStylesheetLink", Model.Context.Name, new ViewDataDictionary(ViewData))
+    }
+}
+
+<style type="text/css">
+    body > .content .link .rank {
+        width: 3.2ex;
+    }
+</style>
+
+<div id="container">
+
+    @await Component.InvokeAsync("Sidebar", new { domainReference = Model.Context })
+
+    <div class="content" role="main">
+
+        @*Top Sort Span Buttons*@
+        @if (Model.Context != null && Model.Sort == Voat.Domain.Models.SortAlgorithm.Top)
+        {
+            <div>
+                <ul class="tabmenu submenu">
+                    @{
+                        var spans = new SortSpan[] { SortSpan.Day, SortSpan.Week, SortSpan.Month, SortSpan.Quarter, SortSpan.Year, SortSpan.All };
+                        foreach (var span in spans)
+                        {
+                            <li class='@(Model.Span.HasValue && Model.Span.Value == span ? "selected" : "disabled")'>@Html.RouteLink(span.ToString(), Model.Items.RouteName, new { sort = (Model.Sort == null ? "" : Model.Sort.ToString().ToLower()), span = span.ToString().ToLower() })</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <div class="sitetable linklisting">
+            @if (Model.IsActualSubverse)
+            {
+                @await Component.InvokeAsync("StickiedSubmission", Model.Context)
+            }
+            else if (Model.Context == null || (Model.Context != null && Model.Context.Type != DomainType.Set))
+            {
+                @Html.Partial("~/Views/Welcome/_FirstTimeVisitorWelcome.cshtml")
+                @await Component.InvokeAsync("Featured")
+                @await Component.InvokeAsync("StickiedSubmission", null)
+            }
+
+            @if (Model.Items.Count <= 0)
+            {
+                Html.RenderPartial("_DefaultMessage");
+            }
+
+            @foreach (var submission in Model.Items)
+            {
+                @Html.Partial("~/Views/Shared/Submissions/_Submission.cshtml", submission, new ViewDataDictionary(ViewData) { { "CssClass", new string[] { counter % 2 == 0 ? "even" : "odd" } } })
+                counter++;
+            }
+        </div>
+
+        @{
+
+            Model.Items.RouteData = ViewContext.RouteData.Values;
+            if (Model.Sort != null)
+            {
+                Model.Items.RouteData["sort"] = Model.Sort.ToString().ToLower();
+            }
+            if (Model.Span != null)
+            {
+                Model.Items.RouteData["span"] = Model.Span.ToString().ToLower();
+            }
+            if (!String.IsNullOrEmpty(Context.Request.Query["frontpage"]))
+            {
+                Model.Items.RouteData["frontpage"] = Context.Request.Query["frontpage"];
+            }
+        }
+        @Html.DisplayFor(model => Model.Items, "IPaginatedList")
+
+        @*<div class="pagination-container">
+            <ul>
+                @if (Model.Submissions.HasPreviousPage)
+                {
+                    <li class="btn-whoaverse-paging">
+                        @Html.RouteLink("� prev", Model.Submissions.RouteName, new {
+                       page = (Model.Submissions.PageIndex - 1),
+                       sort = (Model.Sort == null ? "" : Model.Sort.ToString().ToLower()),
+                       time = (Model.Span == null ? "" : Model.Span.ToString().ToLower()),
+                       frontpage = Request.Query["frontpage"]
+                   }, new {rel = "prev"})
+                    </li>
+                }
+
+                @if (Model.Submissions.HasNextPage)
+                {
+                    <li class="btn-whoaverse-paging">
+                        @Html.RouteLink("next �", Model.Submissions.RouteName, new {
+                       page = (Model.Submissions.PageIndex + 1),
+                       sort = (Model.Sort == null ? "" : Model.Sort.ToString().ToLower()),
+                       time = (Model.Span == null ? "" : Model.Span.ToString().ToLower()),
+                       frontpage = Request.Query["frontpage"]
+                   }, new { rel = "next" })
+                    </li>
+                }
+            </ul>
+        </div>*@
+
+        @if (!Model.IsActualSubverse)
+        {
+            <div>
+                <a href="/random">try a random subverse</a> or <a href="/randomnsfw">a NSFW random subverse</a>
+            </div>
+        }
+    </div>
+</div>

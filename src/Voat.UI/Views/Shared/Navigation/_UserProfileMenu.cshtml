@@ -1,0 +1,42 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@model Voat.Models.ViewModels.NavigationViewModel
+
+@{
+    
+    var url = Context.Request.GetUrl().AbsolutePath.ToLower();
+
+}
+
+<ul class="tabmenu ">
+    <li class='@(url.EndsWith(Model.Name.ToLower()) ? "selected" : "disabled")'><a href="~/user/@Model.Name">Overview</a></li>
+    <li class='@(url.Contains("/submissions") ? "selected" : "disabled")'><a href="~/user/@Model.Name/submissions">Submissions</a></li>
+    <li class='@(url.Contains("/comments") ? "selected" : "disabled")'><a href="~/user/@Model.Name/comments">Comments</a></li>
+    <li class='@(url.Contains("/sets") ? "selected" : "disabled")'><a href="~/user/@Model.Name/sets">Sets</a></li>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        if (User.Identity.Name == Model.Name)
+        {
+            <li class='@(url.Contains("/saved") ? "selected" : "disabled")'><a href="~/user/@Model.Name/saved">Saved</a></li>
+        }
+    }
+</ul>

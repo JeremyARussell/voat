@@ -1,0 +1,39 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@{
+    string destination = ViewBag.Destination;
+    ViewBag.Title = "Warning: The subverse " + destination + " is Not Safe For Work";
+}
+
+<div id="container">
+    <div >
+        <div class="centered">
+            <h1 class="red">Warning!</h1>
+            <h1>The subverse @destination has content which is Not Safe For Work!</h1>
+            <h1>You must be at least 18 years old in order to view this content.</h1>
+            <h1 class="red">Are you over 18 and want to see adult rated content?</h1>
+            <p>
+                <a class="btn-whoaverse" href="/subverses/adultcontent?destination=@destination&nsfwok=true">Yes, I am over 18!</a>
+                <a class="btn-whoaverse" href="/">No, take me back.</a>
+            </p>
+        </div>
+    </div>
+</div>

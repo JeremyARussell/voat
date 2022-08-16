@@ -1,0 +1,117 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@using Voat.Data.Models
+
+@{
+    var userName = ViewBag.UserName;
+    ViewBag.Title = "Profile overview for " + userName;
+}
+
+<div id="container" class="page-userprofile">
+
+    @await Component.InvokeAsync("Sidebar",
+        new { domainReference = new Voat.Domain.Models.DomainReference(Voat.Domain.Models.DomainType.User, userName)
+        })
+
+    <div class="content" role="main">
+        <div class="alert-title">Profile overview for @userName.</div>
+        <div class="userstats">
+            <div class="userstats-heading-1">Submission statistics</div>
+            <div>
+                <div class="userstats-body">
+                    @{
+                        var userStatsModel = UserHelper.UserStatsModel(userName);
+
+                        if (userStatsModel.TopSubversesUserContributedTo.Count > 0)
+                        {
+                            <p>This user has mostly submitted to the following subverses (showing top 5):</p>
+                            foreach (var item in userStatsModel.TopSubversesUserContributedTo)
+                            {
+                                <p><strong>@item.Count</strong> submissions to <a href="/v/@item.SubverseName">@item.SubverseName</a></p>
+                            }
+                        }
+                        else
+                        {
+                            <p>This user made no submissions.</p>
+                        }
+                    }
+                    <p>This user has so far shared a total of <strong>@userStatsModel.LinkSubmissionsSubmitted</strong> links, started a total of <strong>@userStatsModel.MessageSubmissionsSubmitted</strong> discussions and submitted a total of <strong>@userStatsModel.TotalCommentsSubmitted</strong> comments.</p>
+                </div>
+            </div>
+        </div>
+        <div class="userstats">
+            <div class="userstats-heading-1">Voting habits</div>
+            <div class="userstats-body">
+                <p><strong>Submissions:</strong> This user has upvoted <strong>@userStatsModel.TotalSubmissionsUpvoted</strong> and downvoted <strong>@userStatsModel.TotalSubmissionsDownvoted </strong>submissions.</p>
+                <p><strong>Comments:</strong> This user has upvoted <strong>@userStatsModel.TotalCommentsUpvoted</strong> and downvoted <strong>@userStatsModel.TotalCommentsDownvoted </strong>comments.</p>
+            </div>
+        </div>
+        <div class="userstats">
+            <div class="userstats-heading-1">Submission ratings</div>
+            <p class="userstats-heading-2">5 highest rated submissions:</p>
+            <div class="userstats-body">
+                @{
+                    if (userStatsModel.HighestRatedSubmissions.Count > 0)
+                    {
+                        foreach (Submission item in userStatsModel.HighestRatedSubmissions)
+                        {
+                            var score = item.UpCount - item.DownCount;
+                            <p><a class="userstats-submission-title" href="@VoatUrlFormatter.CommentsPagePath(item.Subverse, item.ID)">@item.Title</a>, submitted: @item.CreationDate, <span class="userstats-submission-score">@score points</span> (<span class="post_upvotes">+@item.UpCount</span>|<span class="post_downvotes">-@item.DownCount</span>)</p>
+                        }
+                    }
+                    else
+                    {
+                        <p>This user made no submissions.</p>
+                    }
+                }
+            </div>
+            <p class="userstats-heading-2">5 lowest rated submissions:</p>
+            <div class="userstats-body">
+                @{
+                    if (userStatsModel.LowestRatedSubmissions.Count > 0)
+                    {
+                        foreach (Submission item in userStatsModel.LowestRatedSubmissions)
+                        {
+                            var score = item.UpCount - item.DownCount;
+
+                            <p><a class="userstats-submission-title" href="@VoatUrlFormatter.CommentsPagePath(item.Subverse, item.ID)">@item.Title</a>, submitted: @item.CreationDate, <span class="userstats-submission-score">@score points</span> (<span class="post_upvotes">+@item.UpCount</span>|<span class="post_downvotes">-@item.DownCount</span>)</p>
+                        }
+                    }
+                    else
+                    {
+                        <p>This user made no submissions.</p>
+                    }
+                }
+            </div>
+        </div>
+        <div class="userstats">
+            <div class="userstats-heading-1">Comment ratings</div>
+            <p class="userstats-heading-2">3 highest rated comments:</p>
+            <div class="userstats-body">
+               @Html.Partial("_RatedCommentList.cshtml", (IEnumerable<Voat.Data.Models.Comment>)userStatsModel.HighestRatedComments) 
+            </div>
+            <p class="userstats-heading-2">3 lowest rated comments:</p>
+            <div class="userstats-body">
+               @Html.Partial("_RatedCommentList.cshtml", (IEnumerable<Voat.Data.Models.Comment>)userStatsModel.LowestRatedComments) 
+            </div>
+        </div>
+    </div>
+</div>

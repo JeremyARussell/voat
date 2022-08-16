@@ -1,0 +1,120 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+@model Voat.Domain.Models.DomainReference
+
+@{
+    string userName = Model.Name;
+    //This is an acceptable constructor call
+    var userData = new Voat.Domain.UserData(userName);
+
+    //System.Diagnostics.Debug.Assert(userData.UserName.IsEqual(userName), "Possible mismatched Profile 1");
+    //System.Diagnostics.Debug.Assert(userData.Information.UserName.IsEqual(userName), "Possible mismatched Profile 2");
+
+    DateTime userRegistrationDateTime = userData.Information.RegistrationDate;
+
+    <style>
+        .titlebox {
+            width: 251px;
+        }
+    </style>
+
+    <div class="side">
+        <div class="titlebox footer rounded">
+            <div class="thumbnail may-blank user-avatar">
+                <img src="@userData.Information.ProfilePicture" alt="" class="user-avatar">
+            </div>
+            &ldquo;
+            <span class="user-quote">
+                @userData.Information.Bio
+            </span>
+            &rdquo;
+        </div>
+        <div class="bottom">
+            <p class="h6">
+                Member for: <b>@Age.ToRelative(userRegistrationDateTime)</b><br />
+                <span class="bottommenu">(joined on: @userRegistrationDateTime.ToShortDateString())</span>
+            </p>
+            @if (User.Identity.IsAuthenticated && !User.Identity.Name.IsEqual(userName))
+            {
+                <a href="#" class="btn-whoaverse-paging disabled">
+                    Follow
+                </a>
+                string blockText = "block";
+                string blockClass = "";
+                if (Voat.Utilities.MesssagingUtility.IsSenderBlocked(userName, User.Identity.Name))
+                {
+                    blockText = "unblock";
+                    blockClass = "btn-voat-off";
+                }
+                <button type="button" onclick="return blockUserToggle(this, '@userName')" class="btn-whoaverse-paging btn-voat @blockClass">@blockText</button>
+                <a href="#" class="btn-whoaverse-paging disabled">
+                    Report
+                </a>
+                <a href="/messages/compose?recipient=@userName" class="btn-whoaverse-paging">
+                    Send a message
+                </a>
+            }
+        </div>
+        <div class="titlebox footer rounded">
+            <h2 class="hover whoaversename">
+                Contribution points
+            </h2>
+            <div class="bottom">
+                <p class="h6">
+                    Submission Contribution Points: <b>@userData.Information.SubmissionPoints.Sum</b>
+                </p>
+                <p class="h6">
+                    Comment Contribution Points: <b>@userData.Information.CommentPoints.Sum</b>
+                </p>
+            </div>
+            <div class="titlebox footer rounded">
+                <h2 class="hover whoaversename">
+                    Badges and trophies
+                </h2>
+                <div class="bottom">
+                    @if (userData.Information.Badges.Count() > 0)
+                    {
+                        foreach (var badge in userData.Information.Badges)
+                        {
+                            if (badge.Graphic != null)
+                            {
+                                <img style="cursor: help" src="@badge.Graphic" data-toggle="popover" data-trigger="focus" title="@badge.Name" data-content="@badge.Title (@badge.CreationDate.ToShortDateString())" />
+                            }
+                            else
+                            {
+                                <p class="sidebar-badge" title="@badge.Title, awarded on: @badge.CreationDate.ToShortDateString()">@badge.Name</p>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <p>This user currently has no badges.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        @Html.Partial("~/Views/Shared/Userprofile/_SidebarSubsUserModerates.cshtml", userData.Information.Moderates)
+
+        @if (userData.Preferences.DisplaySubscriptions)
+        {
+            @Html.Partial("~/Views/Shared/Userprofile/_SidebarSubsUserIsSubscribedTo.cshtml", userData.Subscriptions[Voat.Domain.Models.DomainType.Subverse].OrderBy(x => x).Select(x => new SelectListItem() { Value = x }).ToList())
+        }
+    </div>
+}

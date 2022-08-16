@@ -1,0 +1,72 @@
+@*
+    
+    Copyright(c) Voat, Inc.
+
+    This file is part of Voat.
+
+    This source file is subject to version 3 of the GPL license,
+    that is bundled with this package in the file LICENSE, and is
+    available online at http://www.gnu.org/licenses/gpl-3.0.txt;
+    you may not use this file except in compliance with the License.
+
+    Software distributed under the License is distributed on an
+    "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+    or implied. See the License for the specific language governing
+    rights and limitations under the License.
+
+    All Rights Reserved.
+
+*@
+
+@using Voat.Models.ViewModels
+
+@{
+    ViewBag.Title = "Manage Account";
+    var userData = new Voat.Domain.UserData(User.Identity.Name);
+}
+
+<div id="container" class="page-userprofile">
+    @await  Component.InvokeAsync("Sidebar", new { domainReference = new Voat.Domain.Models.DomainReference(Voat.Domain.Models.DomainType.User, User.Identity.Name) })
+    <div class="content" role="main">
+
+        <div class="row nomargin">
+            <div class="well col-md-12">
+                <div class="alert-title">Your public profile</div>
+
+                @if (!String.IsNullOrEmpty(ViewBag.StatusMessage))
+                {
+                    <p class="validation-summary-errors">@ViewBag.StatusMessage</p>
+                }
+                <div asp-validation-summary="All"></div>
+                <section id="userPreferences">
+                   @Html.Partial("_UserPreferencesAbout", new UserAboutViewModel()
+                   {
+                       Bio = userData.Information.Bio,
+                       Avatar = userData.Information.ProfilePicture
+                   })
+                </section>
+                <div class="alert-title">User preferences</div>
+
+                <section id="userPreferences">
+                    @Html.Partial("_UserPreferences", userData.Preferences)
+                </section>
+
+                <div class="alert-title">Account e-mail</div>
+                <section id="userEmail">
+                    @Html.Partial("_ChangeAccountEmail", (UserEmailViewModel)ViewBag.UserEmailViewModel)
+                </section>
+
+                <div class="alert-title">Change your password</div>
+                @Html.Partial("_ChangeAccountSettings", new ChangePasswordViewModel())
+
+                <div class="alert-title">Delete your account</div>
+
+                @Html.ActionLink("Go To Delete Page", "Delete")
+            </div>
+            @*@section PageScripts {
+                @Scripts.Render("~/bundles/jqueryval")
+            }*@
+
+        </div>
+    </div>
+</div>
